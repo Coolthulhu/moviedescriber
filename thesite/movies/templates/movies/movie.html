@@ -1,0 +1,38 @@
+<html>
+    <head>
+        {% csrf_token %}
+        <title>Movie list</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            function movie_action(id_element, method, result_elem) {
+                id = $(id_element).val()
+                $.ajax({
+                    url: 'movies/' + id + '/',
+                    method: method,
+                    headers: { 'X-CSRFToken': csrftoken },
+                    mode: 'same-origin'
+                })
+                .done(function(reponse) {
+                    my_id = id
+                    $(result_elem).text(reponse)
+                })
+                .fail(function(xhr, status, error) {
+                    $(result_elem).text('' + status + " " + error)
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <form method="post">
+            {% csrf_token %}
+            <h3>Movie:</h3>
+            {{ form.as_p }}
+            <hr>
+            <h2>Ratings:</h2>
+            {{ formset.as_p }}
+            <input type="submit" value="Modify">
+        </form>
+    </body>
+</html>

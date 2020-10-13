@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Movie list</title>
+    </head>
+    <body>
+        <h2>Movies</h2>
+        <ul>
+            <table style="width:100%">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Ratings</th>
+                </tr>
+                {% for movie in object_list %}
+                <tr>
+                    <td><a href="{{ movie.id }}/">{{ movie.id }}</a></td>
+                    <td>{{ movie.title }}</td>
+                    <td>{{ movie.ratings_set.count }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </ul>
+    </body>
+</html>

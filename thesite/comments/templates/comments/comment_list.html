@@ -1,0 +1,21 @@
+{% block content %}
+    <h2>Comments:</h2>
+    <ul>
+        <table style="width:100%">
+            <tr>
+                <th>Comment ID</th>
+                <th>Movie ID</th>
+                <th>Movie title</th>
+                <th>Text</th>
+            </tr>
+            {% for comment in object_list %}
+            <tr>
+                <td><a href="{{ comment.id }}/">{{ comment.id }}</a></td>
+                <td>{{ comment.movie.id }}</td>
+                <td>{{ comment.movie.title }}</td>
+                <td>{{ comment.text }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+    </ul>
+{% endblock %}

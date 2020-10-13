@@ -1,0 +1,85 @@
+<html>
+    <head>
+        {% csrf_token %}
+        <title>Movie Describer</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            function movie_action(id_element, method, result_elem) {
+                id = $(id_element).val()
+                $.ajax({
+                    url: 'movies/' + id + '/',
+                    method: method,
+                    headers: { 'X-CSRFToken': csrftoken },
+                    mode: 'same-origin'
+                })
+                .done(function(reponse) {
+                    my_id = id
+                    $(result_elem).text(reponse)
+                })
+                .fail(function(xhr, status, error) {
+                    $(result_elem).text('' + status + " " + error)
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <p>
+            <form action="/movies/" method="get" id="listform">
+            </form>
+            
+            <button type="submit" form="listform" value="Submit">List movies</button> 
+        </p>
+        <hr>
+        <p>
+            <form action="/movies/" method="post" id="addform">
+                {% csrf_token %}
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title"><br>
+            </form>
+            
+            <button type="submit" form="addform" value="Submit">Add movie</button> 
+        </p>
+        <hr>
+        <p>
+            <label for="deleteid">ID:</label>
+            <input type="text" id="deleteid" name="ID"><br>
+            <button onclick="movie_action('#deleteid', 'delete', '#delete_status')">Delete movie</button>
+            
+            <label id="delete_status"></label>
+        </p>
+        <hr>
+        <p>
+            <form action="/comments/" method="post" id="addcommentform">
+                {% csrf_token %}
+                <label for="id">ID:</label>
+                <input type="text" id="id" name="movie_id"><br>
+                <label for="comment">Comment:</label>
+                <input type="text" id="comment" name="text"><br>
+            </form>
+            
+            <button type="submit" form="addcommentform" value="Submit">Add comment</button>
+        </p>
+        <hr>
+        <p>
+            <form action="/comments/" method="get" id="listcommentsform">
+                <label for="id">ID (optional):</label>
+                <input type="text" id="id" name="id"><br>
+            </form>
+            
+            <button type="submit" form="listcommentsform" value="Submit">List comments</button> 
+        </p>
+        <hr>
+        <p>
+            <form action="/top/" method="get" id="topform">
+                <label for="fromdate">From:</label>
+                <input type="date" id="fromdate" name="start_date"><br>
+                <label for="todate">To:</label>
+                <input type="date" id="todate" name="end_date"><br>
+            </form>
+            
+            <button type="submit" form="topform" value="Submit">Get most commented movies</button>
+        </p>
+    </body>
+</html>
