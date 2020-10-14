@@ -17,6 +17,29 @@ class TestAddComment(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, Comment.objects.all().count())
 
+class TestListComments(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def testListUnfilteredComments(self):
+        movie = Movie(title="1")
+        movie.save()
+        Comment.objects.bulk_create([Comment(movie=movie, date="2000-01-01") for i in range(3)])
+        response = self.client.get('/comments/')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(3, len(response.json()))
+
+    def testListFilteredComments(self):
+        movie1 = Movie(title="1")
+        movie1.save()
+        movie2 = Movie(title="2")
+        movie2.save()
+        Comment.objects.bulk_create([Comment(movie=movie1, date="2000-01-01") for i in range(2)])
+        Comment.objects.bulk_create([Comment(movie=movie2, date="2000-01-01") for i in range(3)])
+        response = self.client.get('/comments/', {"id": 1})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()))
+
 class TestTopCommented(TestCase):
     def setUp(self):
         self.client = Client()

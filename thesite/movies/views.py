@@ -19,9 +19,9 @@ from movies.omdb_interface import get_movie_from_omdbapi
 
 import json
 
-class MovieView(generic.ListView):
-    model = Movie
-    ordering = "title"
+class MovieView(View):
+    def get(self, request):
+        return JsonResponse(list(Movie.objects.values()), safe=False)
 
     def post(self, request):
         form = AddMovieForm(request.POST)

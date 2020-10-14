@@ -5,6 +5,22 @@ from unittest.mock import patch, MagicMock
 from movies import omdb_interface
 from movies.views import update_ratings_from_json
 
+class TestListMovies(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def testListThreeMovies(self):
+        movies = [Movie(title=str(i)) for i in range(3)]
+        Movie.objects.bulk_create(movies)
+        response = self.client.get('/movies/')
+        self.assertEqual(200, response.status_code)
+        data = response.json()
+        self.assertEqual(3, len(data))
+        titles = [movie['title'] for movie in data]
+        self.assertIn("0", titles)
+        self.assertIn("1", titles)
+        self.assertIn("2", titles)
+
 class TestAddMovie(TestCase):
     def setUp(self):
         self.client = Client()
