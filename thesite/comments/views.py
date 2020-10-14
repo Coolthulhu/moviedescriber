@@ -20,7 +20,7 @@ class CommentListView(ListView):
         try:
             id = self.request.GET.get('movie')
             return queryset.filter(id=int(id))
-        except TypeError:
+        except ValueError:
             pass
         return queryset
 
