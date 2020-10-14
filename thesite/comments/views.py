@@ -23,7 +23,7 @@ class CommentListView(View):
         if id is not None:
             comments = comments.filter(movie__id=id)
         # ID added for easier comment editing
-        comments = comments.values('id', 'movie', 'text')
+        comments = comments.values('id', 'movie', 'text', 'date')
         return JsonResponse(list(comments.all()), safe=False)
 
     # TODO: Use CreateView
