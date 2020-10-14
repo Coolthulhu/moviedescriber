@@ -13,5 +13,6 @@ services:
     depends_on:
       - migration
   migration:
+      build: .
       command: python manage.py migrate --noinput
 
