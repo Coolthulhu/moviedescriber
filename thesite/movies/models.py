@@ -25,6 +25,8 @@ class Movie(models.Model):
     box_office = models.CharField(max_length=100, verbose_name="Box office")
     production = models.CharField(max_length=100, verbose_name="Production")
     website = models.CharField(max_length=100, verbose_name="Website")
+    writer = models.CharField(max_length=100, verbose_name="Writer")
+    actors = models.CharField(max_length=1000, verbose_name="Actors")
 
     class Meta:
         indexes = [

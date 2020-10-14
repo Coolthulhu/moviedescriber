@@ -17,7 +17,9 @@ omdb_name_mapping = {
     'Awards': 'awards', 'Poster': 'poster', 'Metascore': 'metascore',
     'imdbRating': 'imdb_rating', 'imdbVotes': 'imdb_votes', 'imdbID': 'imdb_id',
     'Type': 'movie_type', 'DVD': 'dvd', 'BoxOffice': 'box_office',
-    'Production': 'production', 'Website': 'website', 'Ratings': None
+    'Production': 'production', 'Website': 'website', 'Writer': 'writer',
+    'Actors': 'actors',
+    'Ratings': None
 }
 
 def get_data_from_omdbapi(title):
@@ -31,6 +33,7 @@ def get_data_from_omdbapi(title):
 
 # TODO: Split decoding and saving
 def omdb_to_model(json):
+    logger.info("Processing movie data: {}".format(json))
     # Copy, to avoid modifying input
     json = dict(json)
     # Response isn't a part of the movie
