@@ -26,7 +26,6 @@ class TestAddMovie(TestCase):
 class TestPutMovie(TestCase):
     def setUp(self):
         self.client = Client()
-        Movie.objects.all().delete()
 
     def testNonexistentMovie(self):
         unused_id = 2
@@ -70,6 +69,32 @@ class TestPutMovie(TestCase):
         self.assertEqual(1, len(ratings))
         self.assertEqual("s", ratings.first().source)
         self.assertEqual("v", ratings.first().value)
+
+class TestDeleteMovie(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def testDeleteInvalidMovie(self):
+        response = self.client.delete('/movies/1', follow=True)
+        self.assertNotEqual(200, response.status_code)
+
+    def testDeleteExistingMovie(self):
+        movie = Movie()
+        movie.save()
+        self.assertTrue(Movie.objects.filter(id=1).exists())
+        response = self.client.delete('/movies/1/', follow=True)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(Movie.objects.filter(id=1).exists())
+
+    def testDeleteMovieTwice(self):
+        movie = Movie()
+        movie.save()
+        self.assertTrue(Movie.objects.filter(id=1).exists())
+        response = self.client.delete('/movies/1/', follow=True)
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(Movie.objects.filter(id=1).exists())
+        response = self.client.delete('/movies/1/', follow=True)
+        self.assertNotEqual(200, response.status_code)
 
 class TestOMDBInterface(TestCase):
     def testEmptyInput(self):

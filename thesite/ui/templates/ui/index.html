@@ -54,7 +54,7 @@
             <form action="/comments/" method="post" id="addcommentform">
                 {% csrf_token %}
                 <label for="id">ID:</label>
-                <input type="text" id="id" name="movie_id"><br>
+                <input type="text" id="id" name="movie"><br>
                 <label for="comment">Comment:</label>
                 <input type="text" id="comment" name="text"><br>
             </form>
@@ -65,7 +65,7 @@
         <p>
             <form action="/comments/" method="get" id="listcommentsform">
                 <label for="id">ID (optional):</label>
-                <input type="text" id="id" name="id"><br>
+                <input type="text" id="id" name="movie"><br>
             </form>
             
             <button type="submit" form="listcommentsform" value="Submit">List comments</button> 

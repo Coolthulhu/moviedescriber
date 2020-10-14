@@ -18,9 +18,9 @@ class CommentListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         try:
-            id = self.request.GET.get('id')
+            id = self.request.GET.get('movie')
             return queryset.filter(id=int(id))
-        except ValueError:
+        except TypeError:
             pass
         return queryset
 
@@ -28,17 +28,15 @@ class CommentListView(ListView):
     def post(self, request):
         form = AddCommentForm(request.POST)
         if form.is_valid():
-            id = form.cleaned_data['movie']
-            movie_in_db = Movie.objects.filter(id=id)
-            if movie_in_db.exists():
-                now = datetime.datetime.now().date()
-                Comment(movie=movie_in_db.first(), text=form.cleaned_data['text'], date=now).save()
-            else:
-                return HttpResponseNotFound("No movie with id {}".format(id))
-            # Redirect to self should turn POST to GET
+            movie = form.cleaned_data['movie']
+            now = datetime.datetime.now().date()
+            Comment(movie=movie, text=form.cleaned_data['text'], date=now).save()
+            # Redirect to self turns POST to GET
             return redirect(request.path)
+        elif 'movie' in form.errors:
+            return HttpResponseNotFound("No movie with id {}".format(form.data['movie']))
         else:
-            return HttpResponseBadRequest(form.errors)
+            return HttpResponseBadRequest("Text too long")
 
 """Convenient view for changing comment date."""
 class CommentUpdateView(UpdateView):
@@ -52,10 +50,15 @@ def top_view(request):
         return HttpResponseBadRequest("Invalid params: {}".format(form.errors))
     start_date = form.cleaned_data['start_date']
     end_date = form.cleaned_data['end_date']
-    commented = (
+    commented = get_ranked_movies(start_date, end_date)
+    return JsonResponse(list(commented), safe=False)
+
+def get_ranked_movies(start_date, end_date):
+    return (
         Movie.objects.all()
         # Renaming id to movie_id
         .annotate(movie_id=F('id'), 
+        # Only count comments in the range
             total_comments=Count('comment', filter=Q(comment__date__range=(start_date, end_date))))
         # Rank is higher for a movie with lower number of comments
         # Equal for same number
@@ -68,4 +71,3 @@ def top_view(request):
         .order_by('rank')
         .values('movie_id', 'total_comments', 'rank')
     )
-    return JsonResponse(list(commented), safe=False)

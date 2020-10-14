@@ -38,6 +38,9 @@ class Movie(models.Model):
 
     def get_absolute_url(self):
         return reverse('movies:details', kwargs={'pk': self.id})
+    
+    def __str__(self):
+        return '{}, year {}'.format(self.title, self.year)
 
 class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
