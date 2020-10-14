@@ -1,6 +1,6 @@
 build:
-  web:
-    build: Dockerfile
+  docker:
+    web: Dockerfile
     depends_on:
       - migration
   migration:
