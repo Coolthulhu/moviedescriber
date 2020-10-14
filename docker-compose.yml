@@ -18,5 +18,7 @@ services:
     build: .
     environment:
       - SECRET_KEY=${SECRET_KEY}
+    volumes:
+      - ./thesite:/thesite
     command: python manage.py migrate --noinput
 
