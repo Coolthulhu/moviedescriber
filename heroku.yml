@@ -1,0 +1,10 @@
+build:
+  web:
+    build: Dockerfile
+    depends_on:
+      - migration
+  migration:
+    command: python manage.py migrate --noinput
+
+run:
+  web: python manage.py startserver
