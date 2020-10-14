@@ -1,11 +1,15 @@
 version: "3.8"
 services:
-    web:
-      build: .
-      ports:
-        - "8000:8000"
-      environment:
-        - SECRET_KEY=${SECRET_KEY}
-        - OMDB_API_KEY=${OMDB_API_KEY}
-    redis:
-      image: "redis:alpine"
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - OMDB_API_KEY=${OMDB_API_KEY}
+    restart: always
+    volumes:
+      - ./thesite:/thesite
+  redis:
+    image: "redis:alpine"
+

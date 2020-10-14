@@ -32,14 +32,9 @@ class MovieView(generic.ListView):
             movie_in_db = Movie.objects.filter(title=title)
             if movie_in_db.exists():
                 return redirect(movie_in_db.first().get_absolute_url())
+            # If this line fails, we want a 500
             movie = get_movie_from_omdbapi(title)
-            # In case omdb tries to match the title more aggressively and the user tries multiple variants of the same title
-            movie_in_db = Movie.objects.filter(title=movie.title)
-            if not movie_in_db.exists():
-                movie.save()
-                movie_in_db = Movie.objects.filter(id=movie.id)
-
-            return redirect(movie_in_db.first().get_absolute_url())
+            return redirect(movie.get_absolute_url())
         else:
             return HttpResponseBadRequest(form.errors)
 
@@ -74,12 +69,32 @@ class SpecificMovieView(UpdateView):
         movie.delete()
         return HttpResponse("Deleted movie {}".format(title))
 
+    # This would most likely be much cleaner with Django REST framework...
     def put(self, request, pk):
         # Not using get_object_or_404 because Model doesn't have update
         movie_from_db = Movie.objects.filter(id=pk)
         if not movie_from_db.exists():
             return HttpResponseNotFound("No movie with id {} exists".format(pk))
-        # TODO: Error handling
-        js = json.loads(request.body)
-        movie_from_db.update(**js)
+        try:
+            js = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest("Provided data is not a json")
+        ratings = js.pop('ratings', None)
+        try:
+            movie_from_db.update(**js)
+        except ValueError:
+            return HttpResponseBadRequest("Invalid data provided")
+        if ratings is not None:
+            try:        
+                update_ratings_from_json(movie_from_db.first().id, json.loads(ratings))
+            except (ValueError, json.JSONDecodeError):
+                return HttpResponseBadRequest("Invalid rating array provided")
         return HttpResponse("Updated movie with id {}".format(pk))
+
+def update_ratings_from_json(id, array):
+    movie = Movie.objects.get(pk=id)
+    movie.rating_set.all().delete()
+    new_rating_set = [
+        Rating(movie=movie, source=r['source'], value=r['value']) for r in array
+    ]
+    Rating.objects.bulk_create(new_rating_set)
