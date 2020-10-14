@@ -14,12 +14,14 @@ omdb_name_mapping = {
     'Production': 'production', 'Website': 'website'
 }
 
+# TODO: Split decoding and saving
 def omdb_to_model(response):
     json = response.json()
     # TODO: Replace "N/A" with nulls
     new_args = {v: json[k] for k, v in omdb_name_mapping.items() if k in json}
     movie = Movie(**new_args)
     movie.save()
+    # TODO: bulk_create
     for r in json['Ratings']:
         Rating(movie=movie, source=r['Source'], value=r['Value']).save()
     return movie

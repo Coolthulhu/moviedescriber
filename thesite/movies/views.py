@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from movies.forms import AddMovieForm, MovieModelForm
 from movies.models import Movie, Rating
@@ -16,6 +16,8 @@ from django.views.generic.edit import UpdateView
 
 from movies.forms import RatingFormset
 from movies.omdb_interface import get_movie_from_omdbapi
+
+import json
 
 class MovieView(generic.ListView):
     model = Movie
@@ -67,13 +69,17 @@ class SpecificMovieView(UpdateView):
         return HttpResponseBadRequest("Form errors: {}<br>Formset errors: {}".format(form.errors, formset.errors))
 
     def delete(self, request, pk):
-        movie_query = Movie.objects.filter(id=pk)
-        if not movie_query.exists():
-            return HttpResponseNotFound()
-        movie = movie_query.first()
+        movie = get_object_or_404(Movie, pk=pk)
         title = movie.title
         movie.delete()
         return HttpResponse("Deleted movie {}".format(title))
 
     def put(self, request, pk):
-        return self.post(self, requests, pk=pk)
+        # Not using get_object_or_404 because Model doesn't have update
+        movie_from_db = Movie.objects.filter(id=pk)
+        if not movie_from_db.exists():
+            return HttpResponseNotFound("No movie with id {} exists".format(pk))
+        # TODO: Error handling
+        js = json.loads(request.body)
+        movie_from_db.update(**js)
+        return HttpResponse("Updated movie with id {}".format(pk))
