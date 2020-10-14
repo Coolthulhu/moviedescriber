@@ -10,6 +10,8 @@ services:
     restart: always
     volumes:
       - ./thesite:/thesite
-  redis:
-    image: "redis:alpine"
+    depends_on:
+      - migration
+  migration:
+      command: python manage.py migrate --noinput
 
