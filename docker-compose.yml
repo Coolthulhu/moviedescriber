@@ -4,5 +4,8 @@ services:
       build: .
       ports:
         - "8000:8000"
+      environment:
+        - SECRET_KEY=${SECRET_KEY}
+        - OMDB_API_KEY=${OMDB_API_KEY}
     redis:
       image: "redis:alpine"
