@@ -33,7 +33,7 @@ def get_data_from_omdbapi(title):
 
 # TODO: Split decoding and saving
 def omdb_to_model(json):
-    logger.info("Processing movie data: {}".format(json))
+    logger.info("Processing movie data: %s", json)
     # Copy, to avoid modifying input
     json = dict(json)
     # Response isn't a part of the movie
@@ -49,7 +49,7 @@ def omdb_to_model(json):
     if movie_in_db.exists():
         return movie_in_db.first()
     movie.save()
-    logger.info("Added new movie with id:{}, title:{}", movie.id, movie.title)
+    logger.info("Added new movie with id:%d, title:%s", movie.id, movie.title)
     if ratings_json is not None:
         ratings = [Rating(movie=movie, source=r['Source'], value=r['Value']) for r in ratings_json]
         Rating.objects.bulk_create(ratings)
