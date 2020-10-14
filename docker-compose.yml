@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   web:
+    image: moviedescriber
     build: .
     ports:
       - "8000:8000"
@@ -13,6 +14,7 @@ services:
     depends_on:
       - migration
   migration:
+    image: moviedescriber
     build: .
     environment:
       - SECRET_KEY=${SECRET_KEY}
